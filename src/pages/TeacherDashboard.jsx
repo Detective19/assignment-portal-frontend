@@ -97,6 +97,43 @@ console.log("submissions", subRes.data);
     console.log(error);
   }
 };
+const deleteAssignment = async (id) => {
+
+  try {
+
+    await API.delete(`/assignments/${id}`);
+
+    fetchAssignments();
+
+  } catch (error) {
+    console.log(error);
+  }
+
+};
+
+const editAssignment = async (assignment) => {
+
+  const newTitle = prompt("Enter new title", assignment.title);
+  const newDescription = prompt("Enter new description", assignment.description);
+  const newDueDate = prompt("Enter new due date (YYYY-MM-DD)", assignment.dueDate?.split("T")[0]);
+
+  if (!newTitle || !newDescription || !newDueDate) return;
+
+  try {
+
+    await API.put(`/assignments/${assignment._id}`, {
+      title: newTitle,
+      description: newDescription,
+      dueDate: newDueDate
+    });
+
+    fetchAssignments();
+
+  } catch (error) {
+    console.log(error);
+  }
+
+};
 
   useEffect(() => {
     fetchAssignments();
@@ -191,7 +228,26 @@ console.log("submissions", subRes.data);
                 {assignment.submissions}
               </span>
             </div>
+            
             <div className="flex gap-2 mt-3">
+            
+  {assignment.status === "draft" && (
+    <>
+      <button
+        onClick={() => editAssignment(assignment)}
+        className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+      >
+        Edit
+      </button>
+
+      <button
+        onClick={() => deleteAssignment(assignment._id)}
+        className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+      >
+        Delete
+      </button>
+    </>
+  )}
 
   {assignment.status === "draft" && (
     <button
