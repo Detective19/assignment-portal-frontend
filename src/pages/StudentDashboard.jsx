@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 function StudentDashboard() {
+    const navigate = useNavigate();
+
+     const logout = () => {
+
+  localStorage.removeItem("token");
+
+  navigate("/");
+
+};
+
 
   const [assignments, setAssignments] = useState([]);
   const [answers, setAnswers] = useState({});
@@ -27,13 +38,17 @@ function StudentDashboard() {
 
   const submitAnswer = async (assignmentId) => {
     try {
+      if (!answers[assignmentId] || answers[assignmentId].trim() === "") {
+        alert("Answer cannot be empty");
+        return;
+      }
 
       await API.post("/submissions", {
         assignmentId,
         answer: answers[assignmentId]
       });
 
-      alert("Answer submitted");
+      alert("Answer submitted Successfully");
 
       fetchMySubmissions();
 
@@ -68,10 +83,15 @@ function StudentDashboard() {
 
     <div className="p-6">
 
-      <h1 className="text-2xl font-bold mb-6 text-center underline">
-        Student Dashboard
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        <span className="underline">Student Dashboard</span> 🧑🏻‍💻
       </h1>
-
+         <button
+    onClick={logout}
+    className="absolute top-7 right-10 bg-red-500 text-white px-3 py-1 rounded text-sm"
+  >
+    Logout
+  </button>
 
       <h2 className="text-xl font-semibold mb-4 text-blue-600 underline">
         Pending Assignments
@@ -95,9 +115,8 @@ function StudentDashboard() {
 
               <div
                 key={assignment._id}
-                className={`border p-4 rounded flex flex-col gap-2 ${
-                  isExpired ? "border-red-500 bg-red-50" : "border-black"
-                }`}
+                className={`border p-4 rounded flex flex-col gap-2 ${isExpired ? "border-red-500 bg-red-50" : "border-black"
+                  }`}
               >
 
                 <h2 className="text-lg font-semibold">
@@ -163,7 +182,7 @@ function StudentDashboard() {
         {sortedSubmissions.length === 0 ? (
 
           <p className="text-gray-500 text-sm">
-            No submissions yet
+            No submissions yet.
           </p>
 
         ) : (
@@ -176,7 +195,7 @@ function StudentDashboard() {
             >
 
               <h3 className="text-lg font-semibold">
-                ✅ {submission.assignmentId?.title }
+                ✅ {submission.assignmentId?.title}
               </h3>
 
               <p className="text-green-600 font-semibold">

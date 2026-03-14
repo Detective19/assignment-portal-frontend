@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 
+
+
 function TeacherDashboard() {
 
   const [assignments, setAssignments] = useState([]);
@@ -12,11 +14,24 @@ function TeacherDashboard() {
 
   const navigate = useNavigate();
 
+  const logout = () => {
+
+  localStorage.removeItem("token");
+
+  navigate("/");
+
+};
+
   const handleCreateAssignment = async (e) => {
 
     e.preventDefault();
 
     try {
+        if (!title.trim() || !description.trim() || !dueDate.trim()) {  
+            alert("All fields are required");
+            return;
+        }
+
 
       await API.post("/assignments", {
         title,
@@ -27,6 +42,8 @@ function TeacherDashboard() {
       setTitle("");
       setDescription("");
       setDueDate("");
+
+      alert("Assignment created Successfully");
 
       fetchAssignments();
 
@@ -153,13 +170,19 @@ function TeacherDashboard() {
 
   return (
 
-    <div className="p-6">
+    <div className="relative p-6">
 
-      <h1 className="text-2xl font-bold mb-6 text-center underline">
-        Teacher Dashboard
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        <span className="underline">Teacher Dashboard</span>  👩🏻‍🏫
       </h1>
 
-
+    <button
+    onClick={logout}
+    className="absolute top-7 right-10 bg-red-500 text-white px-3 py-1 rounded text-sm"
+  >
+    Logout
+  </button>
+      
       <form
         onSubmit={handleCreateAssignment}
         className="border border-black p-4 rounded mb-6 space-y-3"

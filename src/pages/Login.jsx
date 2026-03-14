@@ -17,11 +17,11 @@ function Login() {
     e.preventDefault();
 
     try {
-        if (!email.trim() || !password.trim()) {
-            setError("Required fields cannot be empty");
-            return;  // Could implement more specific validation here (e.g., email format, password strength) but keeping it simple for now
-            
-        }
+      if (!email.trim() || !password.trim()) {
+        setError("Required fields cannot be empty");
+        return;  // Could implement more specific validation here (e.g., email format, password strength) but keeping it simple for now
+
+      }
       const res = await API.post("/auth/login", {
         email,
         password
@@ -37,8 +37,8 @@ function Login() {
         navigate("/student");
       }
 
-    } catch (err) {  
-        setError(err.response?.data?.message || "Invalid credentials");
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid credentials");
 
     }
 
@@ -48,49 +48,49 @@ function Login() {
 
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
 
-  <h1 className="text-4xl font-bold mb-8">
-    Welcome to Assignment Portal!
-  </h1>
+      <h1 className="text-4xl font-bold mb-8">
+        Welcome to Assignment Portal! 🎉🎉
+      </h1>
 
-  <form
-    onSubmit={handleLogin}
-    className="bg-white p-8 rounded shadow w-[300px] h-[300px]"
-  >
+      <form
+        onSubmit={handleLogin}
+        className="bg-white p-8 rounded shadow w-[300px] h-[300px]"
+      >
 
-    <h2 className="text-2xl font-bold mb-4 text-center">
-      Login
-    </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Login ➡️
+        </h2>
 
-    {error && (
-      <p className="text-red-500 mb-2">{error}</p>
-    )}
+        {error && (
+          <p className="text-red-500 mb-2">{error}</p>
+        )}
 
-    <input
-      type="email"
-      placeholder="Email"
-      className="w-full border p-2 mb-3"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-    />
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full border p-2 mb-3"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-    <input
-      type="password"
-      placeholder="Password"
-      className="w-full border p-2 mb-4"
-      value={password}
-      onChange={(e) => setPassword(e.target.value)}
-    />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full border p-2 mb-4"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-    <button
-      type="submit"
-      className="bg-green-500 text-white w-full py-2"
-    >
-      Login
-    </button>
+        <button
+          type="submit"
+          className="bg-green-500 text-white w-full py-2"
+        >
+          Login
+        </button>
 
-  </form>
+      </form>
 
-</div>
+    </div>
   );
 }
 
