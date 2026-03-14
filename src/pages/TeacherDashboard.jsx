@@ -154,7 +154,7 @@ const editAssignment = async (assignment) => {
     >
 
       <h2 className="text-lg font-semibold">
-        Create Assignment
+        Create Assignment ➕
       </h2>
 
       <input
@@ -183,7 +183,7 @@ const editAssignment = async (assignment) => {
         type="submit"
         className="bg-blue-500 text-white px-4 py-2 rounded"
       >
-        Create Assignment
+        Create Assignment 
       </button>
 
     </form>
@@ -198,7 +198,7 @@ const editAssignment = async (assignment) => {
           >
 
             <h2 className="text-lg font-semibold">
-              {assignment.title}
+              📎 {assignment.title}
             </h2>
 
             <p>{assignment.description}</p>

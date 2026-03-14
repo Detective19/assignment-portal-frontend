@@ -26,7 +26,6 @@ function StudentDashboard() {
   };
 
   const submitAnswer = async (assignmentId) => {
-
     try {
 
       await API.post("/submissions", {
@@ -44,14 +43,11 @@ function StudentDashboard() {
       alert("You may have already submitted");
 
     }
-
   };
 
   useEffect(() => {
-
     fetchAssignments();
     fetchMySubmissions();
-
   }, []);
 
   const availableAssignments = assignments.filter((assignment) => {
@@ -64,7 +60,7 @@ function StudentDashboard() {
 
   });
 
-  const sortedSubmissions = [...mySubmissions].sort( // sorted submissions by submission date
+  const sortedSubmissions = [...mySubmissions].sort(
     (a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)
   );
 
@@ -76,7 +72,6 @@ function StudentDashboard() {
         Student Dashboard
       </h1>
 
-      {/* AVAILABLE ASSIGNMENTS */}
 
       <h2 className="text-xl font-semibold mb-4 text-blue-600 underline">
         Pending Assignments
@@ -92,54 +87,72 @@ function StudentDashboard() {
 
         ) : (
 
-          availableAssignments.map((assignment) => (
+          availableAssignments.map((assignment) => {
 
-            <div
-              key={assignment._id}
-              className="border border-black p-4 rounded flex flex-col gap-2"
-            >
+            const isExpired = new Date(assignment.dueDate) < new Date();
 
-              <h2 className="text-lg font-semibold">
-                {assignment.title}
-              </h2>
+            return (
 
-              <p>{assignment.description}</p>
-
-              <p className="text-sm text-gray-500">
-                Due Date:
-                <span className="font-semibold ml-1">
-                  {new Date(assignment.dueDate).toLocaleDateString()}
-                </span>
-              </p>
-
-              <textarea
-                placeholder="Write your answer..."
-                className="border p-2 w-full"
-                value={answers[assignment._id] || ""}
-                onChange={(e) =>
-                  setAnswers({
-                    ...answers,
-                    [assignment._id]: e.target.value
-                  })
-                }
-              />
-
-              <button
-                onClick={() => submitAnswer(assignment._id)}
-                className="bg-blue-500 text-white px-3 py-1 rounded text-sm w-fit"
+              <div
+                key={assignment._id}
+                className={`border p-4 rounded flex flex-col gap-2 ${
+                  isExpired ? "border-red-500 bg-red-50" : "border-black"
+                }`}
               >
-                Submit Answer
-              </button>
 
-            </div>
+                <h2 className="text-lg font-semibold">
+                  📍 {assignment.title}
+                </h2>
 
-          ))
+                <p>{assignment.description}</p>
+
+                <p className="text-sm text-gray-500">
+                  Due Date:
+                  <span className="font-semibold ml-1">
+                    {new Date(assignment.dueDate).toLocaleDateString()}
+                  </span>
+                </p>
+
+                <textarea
+                  placeholder="Write your answer..."
+                  className="border p-2 w-full"
+                  value={answers[assignment._id] || ""}
+                  onChange={(e) =>
+                    setAnswers({
+                      ...answers,
+                      [assignment._id]: e.target.value
+                    })
+                  }
+                  disabled={isExpired}
+                />
+
+                {isExpired ? (
+
+                  <p className="text-red-600 font-semibold">
+                    Deadline Passed ⛔
+                  </p>
+
+                ) : (
+
+                  <button
+                    onClick={() => submitAnswer(assignment._id)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded text-sm w-fit"
+                  >
+                    Submit Answer
+                  </button>
+
+                )}
+
+              </div>
+
+            );
+
+          })
 
         )}
 
       </div>
 
-      {/* SUBMITTED ASSIGNMENTS */}
 
       <h2 className="text-xl font-semibold mt-10 mb-4 text-green-600 underline">
         Submitted Assignments
@@ -163,7 +176,7 @@ function StudentDashboard() {
             >
 
               <h3 className="text-lg font-semibold">
-                {submission.assignmentId?.title || "Assignment"}
+                ✅ {submission.assignmentId?.title }
               </h3>
 
               <p className="text-green-600 font-semibold">
