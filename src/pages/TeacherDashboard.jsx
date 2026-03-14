@@ -33,7 +33,7 @@ function TeacherDashboard() {
         }
 
 
-      await API.post("/assignments", {
+      await API.post("api/assignments", {
         title,
         description,
         dueDate
@@ -57,7 +57,7 @@ function TeacherDashboard() {
 
     try {
 
-      await API.put(`/assignments/${id}/publish`);
+      await API.put(`api/assignments/${id}/publish`);
       fetchAssignments();
 
     } catch (error) {
@@ -70,7 +70,7 @@ function TeacherDashboard() {
 
     try {
 
-      await API.put(`/assignments/${id}/complete`);
+      await API.put(`api/assignments/${id}/complete`);
       fetchAssignments();
 
     } catch (error) {
@@ -83,7 +83,7 @@ function TeacherDashboard() {
 
     try {
 
-      await API.delete(`/assignments/${id}`);
+      await API.delete(`api/assignments/${id}`);
       fetchAssignments();
 
     } catch (error) {
@@ -105,7 +105,7 @@ function TeacherDashboard() {
 
     try {
 
-      await API.put(`/assignments/${assignment._id}`, {
+      await API.put(`api/assignments/${assignment._id}`, {
         title: newTitle,
         description: newDescription,
         dueDate: newDueDate
@@ -120,14 +120,14 @@ function TeacherDashboard() {
   };
 
   const viewSubmissions = (id) => {
-    navigate(`/teacher/submissions/${id}`);
+    navigate(`api/teacher/submissions/${id}`);
   };
 
   const fetchAssignments = async () => {
 
     try {
 
-      const res = await API.get("/assignments");
+      const res = await API.get("api/assignments");
 
       const assignmentsData = res.data;
 
@@ -136,7 +136,7 @@ function TeacherDashboard() {
         assignmentsData.map(async (assignment) => {
 
           const subRes = await API.get(
-            `/submissions/assignment/${assignment._id}`
+            `api/submissions/assignment/${assignment._id}`
           );
 
           return {

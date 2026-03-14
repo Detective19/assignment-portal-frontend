@@ -12,7 +12,7 @@ function Submissions() {
 
     try {
 
-      const res = await API.get(`/submissions/assignment/${assignmentId}`);
+      const res = await API.get(`api/submissions/assignment/${assignmentId}`);
 
       setSubmissions(res.data);
 

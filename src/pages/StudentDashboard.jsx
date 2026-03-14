@@ -20,7 +20,7 @@ function StudentDashboard() {
 
   const fetchAssignments = async () => {
     try {
-      const res = await API.get("/assignments/published");
+      const res = await API.get("api/assignments/published");
       setAssignments(res.data);
     } catch (error) {
       console.log(error);
@@ -29,7 +29,7 @@ function StudentDashboard() {
 
   const fetchMySubmissions = async () => {
     try {
-      const res = await API.get("/submissions/my");
+      const res = await API.get("api/submissions/my");
       setMySubmissions(res.data.submissions || []);
     } catch (error) {
       console.log(error);
@@ -43,7 +43,7 @@ function StudentDashboard() {
         return;
       }
 
-      await API.post("/submissions", {
+      await API.post("api/submissions", {
         assignmentId,
         answer: answers[assignmentId]
       });
