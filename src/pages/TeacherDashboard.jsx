@@ -120,7 +120,7 @@ function TeacherDashboard() {
   };
 
   const viewSubmissions = (id) => {
-    navigate(`teacher/submissions/${id}`);
+    navigate(`/submissions/${id}`);
   };
 
   const fetchAssignments = async () => {
