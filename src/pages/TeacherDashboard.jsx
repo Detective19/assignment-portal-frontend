@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 function TeacherDashboard() {
 
@@ -30,6 +31,39 @@ function TeacherDashboard() {
     console.log(error);
   }
 
+};
+    const publishAssignment = async (id) => {
+
+  try {
+
+    await API.put(`/assignments/${id}/publish`);
+
+    fetchAssignments();
+
+  } catch (error) {
+    console.log(error);
+  }
+
+};
+
+const completeAssignment = async (id) => {
+
+  try {
+
+    await API.put(`/assignments/${id}/complete`);
+
+    fetchAssignments();
+
+  } catch (error) {
+    console.log(error);
+  }
+
+};
+
+const navigate = useNavigate();
+
+const viewSubmissions = (id) => {
+  navigate(`/teacher/submissions/${id}`);
 };
 
   const fetchAssignments = async () => {
@@ -157,13 +191,41 @@ console.log("submissions", subRes.data);
                 {assignment.submissions}
               </span>
             </div>
+            <div className="flex gap-2 mt-3">
 
+  {assignment.status === "draft" && (
+    <button
+      onClick={() => publishAssignment(assignment._id)}
+      className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+    >
+      Publish
+    </button>
+  )}
+
+  {assignment.status === "published" && (
+    <button
+      onClick={() => completeAssignment(assignment._id)}
+      className="bg-green-600 text-white px-3 py-1 rounded text-sm"
+    >
+      Complete
+    </button>
+  )}
+
+  <button
+    onClick={() => viewSubmissions(assignment._id)}
+    className="bg-gray-600 text-white px-3 py-1 rounded text-sm"
+  >
+    View Submissions
+  </button>
+
+</div>
           </div>
+          
 
         ))}
-
+        
       </div>
-
+      
     </div>
   );
 }
