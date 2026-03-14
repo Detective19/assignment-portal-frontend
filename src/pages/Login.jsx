@@ -12,19 +12,23 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e, demoEmail = null, demoPassword = null) => {
 
-    e.preventDefault();
+    if (e) e.preventDefault();
+
+    const loginEmail = demoEmail || email;
+    const loginPassword = demoPassword || password;
 
     try {
-      if (!email.trim() || !password.trim()) {
-        setError("Required fields cannot be empty");
-        return;  // Could implement more specific validation here (e.g., email format, password strength) but keeping it simple for now
 
+      if (!loginEmail.trim() || !loginPassword.trim()) {
+        setError("Required fields cannot be empty");
+        return;
       }
+
       const res = await API.post("/auth/login", {
-        email,
-        password
+        email: loginEmail,
+        password: loginPassword
       });
 
       const { token, role } = res.data;
@@ -39,7 +43,6 @@ function Login() {
 
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
-
     }
 
   };
@@ -54,7 +57,7 @@ function Login() {
 
       <form
         onSubmit={handleLogin}
-        className="bg-white p-8 rounded shadow w-[300px] h-[300px]"
+        className="bg-white p-8 rounded shadow w-[320px]"
       >
 
         <h2 className="text-2xl font-bold mb-4 text-center">
@@ -62,7 +65,7 @@ function Login() {
         </h2>
 
         {error && (
-          <p className="text-red-500 mb-2">{error}</p>
+          <p className="text-red-500 mb-2 text-sm">{error}</p>
         )}
 
         <input
@@ -83,10 +86,31 @@ function Login() {
 
         <button
           type="submit"
-          className="bg-green-500 text-white w-full py-2"
+          className="bg-green-500 text-white w-full py-2 rounded mb-4"
         >
           Login
         </button>
+
+
+        <div className="flex flex-col gap-2">
+
+          <button
+            type="button"
+            onClick={() => handleLogin(null, "teacher@test.com", "password123")}
+            className="bg-blue-500 text-white py-2 rounded"
+          >
+            Demo Teacher Login
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleLogin(null, "student@test.com", "password123")}
+            className="bg-purple-500 text-white py-2 rounded"
+          >
+            Demo Student Login
+          </button>
+
+        </div>
 
       </form>
 
