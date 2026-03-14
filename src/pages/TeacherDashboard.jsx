@@ -4,6 +4,33 @@ import API from "../services/api";
 function TeacherDashboard() {
 
   const [assignments, setAssignments] = useState([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
+
+  const handleCreateAssignment = async (e) => {
+
+  e.preventDefault();
+
+  try {
+
+    await API.post("/assignments", {
+      title,
+      description,
+      dueDate
+    });
+
+    setTitle("");
+    setDescription("");
+    setDueDate("");
+
+    fetchAssignments(); // doing this to refresh the list after creating a new assignment
+
+  } catch (error) {
+    console.log(error);
+  }
+
+};
 
   const fetchAssignments = async () => {
   try {
@@ -49,13 +76,53 @@ console.log("submissions", subRes.data);
         Teacher Dashboard
       </h1>
 
+      <form
+      onSubmit={handleCreateAssignment}
+      className="border border-black p-4 rounded mb-6 space-y-3"
+    >
+
+      <h2 className="text-lg font-semibold">
+        Create Assignment
+      </h2>
+
+      <input
+        type="text"
+        placeholder="Title"
+        className="border p-2 w-full"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      <textarea
+        placeholder="Description"
+        className="border p-2 w-full"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+      />
+
+      <input
+        type="date"
+        className="border p-2 w-full"
+        value={dueDate}
+        onChange={(e) => setDueDate(e.target.value)}
+      />
+
+      <button
+        type="submit"
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+      >
+        Create Assignment
+      </button>
+
+    </form>
+
       <div className="space-y-4">
 
         {assignments.map((assignment) => (
 
           <div
             key={assignment._id}
-            className="border p-4 rounded flex flex-col gap-2"
+            className="border border-black p-4 rounded flex flex-col gap-2"
           >
 
             <h2 className="text-lg font-semibold">
@@ -63,6 +130,12 @@ console.log("submissions", subRes.data);
             </h2>
 
             <p>{assignment.description}</p>
+             <p className="text-sm text-gray-500">
+    Due Date:
+    <span className="font-semibold text-gray-700 ml-1">
+      {new Date(assignment.dueDate).toLocaleDateString()}
+    </span>
+  </p>
 
             <p className="text-sm font-semibold text-gray-500">
               Status : 
