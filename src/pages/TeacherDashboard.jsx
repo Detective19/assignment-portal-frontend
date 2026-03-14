@@ -8,137 +8,148 @@ function TeacherDashboard() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
-  
+  const [filter, setFilter] = useState("all");
+
+  const navigate = useNavigate();
 
   const handleCreateAssignment = async (e) => {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  try {
+    try {
 
-    await API.post("/assignments", {
-      title,
-      description,
-      dueDate
-    });
+      await API.post("/assignments", {
+        title,
+        description,
+        dueDate
+      });
 
-    setTitle("");
-    setDescription("");
-    setDueDate("");
+      setTitle("");
+      setDescription("");
+      setDueDate("");
 
-    fetchAssignments(); // doing this to refresh the list after creating a new assignment
+      fetchAssignments();
 
-  } catch (error) {
-    console.log(error);
-  }
+    } catch (error) {
+      console.log(error);
+    }
 
-};
-    const publishAssignment = async (id) => {
+  };
 
-  try {
+  const publishAssignment = async (id) => {
 
-    await API.put(`/assignments/${id}/publish`);
+    try {
 
-    fetchAssignments();
+      await API.put(`/assignments/${id}/publish`);
+      fetchAssignments();
 
-  } catch (error) {
-    console.log(error);
-  }
+    } catch (error) {
+      console.log(error);
+    }
 
-};
+  };
 
-const completeAssignment = async (id) => {
+  const completeAssignment = async (id) => {
 
-  try {
+    try {
 
-    await API.put(`/assignments/${id}/complete`);
+      await API.put(`/assignments/${id}/complete`);
+      fetchAssignments();
 
-    fetchAssignments();
+    } catch (error) {
+      console.log(error);
+    }
 
-  } catch (error) {
-    console.log(error);
-  }
+  };
 
-};
+  const deleteAssignment = async (id) => {
 
-const navigate = useNavigate();
+    try {
 
-const viewSubmissions = (id) => {
-  navigate(`/teacher/submissions/${id}`);
-};
+      await API.delete(`/assignments/${id}`);
+      fetchAssignments();
 
-  const fetchAssignments = async () => {
-  try {
+    } catch (error) {
+      console.log(error);
+    }
 
-    const res = await API.get("/assignments");
+  };
 
-    const assignmentsData = res.data;
+  const editAssignment = async (assignment) => {
 
-    const assignmentsWithSubmissions = await Promise.all(
-
-      assignmentsData.map(async (assignment) => {
-
-        const subRes = await API.get(
-          `/submissions/assignment/${assignment._id}`
-        );
-        console.log("assignment", assignment._id);
-console.log("submissions", subRes.data);
-        return {
-          ...assignment,
-          submissions: subRes.data.length
-        };
-
-      })
-
+    const newTitle = prompt("Enter new title", assignment.title);
+    const newDescription = prompt("Enter new description", assignment.description);
+    const newDueDate = prompt(
+      "Enter new due date (YYYY-MM-DD)",
+      assignment.dueDate?.split("T")[0]
     );
 
-    setAssignments(assignmentsWithSubmissions);
+    if (!newTitle || !newDescription || !newDueDate) return;
 
-  } catch (error) {
-    console.log(error);
-  }
-};
-const deleteAssignment = async (id) => {
+    try {
 
-  try {
+      await API.put(`/assignments/${assignment._id}`, {
+        title: newTitle,
+        description: newDescription,
+        dueDate: newDueDate
+      });
 
-    await API.delete(`/assignments/${id}`);
+      fetchAssignments();
 
-    fetchAssignments();
+    } catch (error) {
+      console.log(error);
+    }
 
-  } catch (error) {
-    console.log(error);
-  }
+  };
 
-};
+  const viewSubmissions = (id) => {
+    navigate(`/teacher/submissions/${id}`);
+  };
 
-const editAssignment = async (assignment) => {
+  const fetchAssignments = async () => {
 
-  const newTitle = prompt("Enter new title", assignment.title);
-  const newDescription = prompt("Enter new description", assignment.description);
-  const newDueDate = prompt("Enter new due date (YYYY-MM-DD)", assignment.dueDate?.split("T")[0]);
+    try {
 
-  if (!newTitle || !newDescription || !newDueDate) return;
+      const res = await API.get("/assignments");
 
-  try {
+      const assignmentsData = res.data;
 
-    await API.put(`/assignments/${assignment._id}`, {
-      title: newTitle,
-      description: newDescription,
-      dueDate: newDueDate
-    });
+      const assignmentsWithSubmissions = await Promise.all(
 
-    fetchAssignments();
+        assignmentsData.map(async (assignment) => {
 
-  } catch (error) {
-    console.log(error);
-  }
+          const subRes = await API.get(
+            `/submissions/assignment/${assignment._id}`
+          );
 
-};
+          return {
+            ...assignment,
+            submissions: subRes.data.length
+          };
+
+        })
+
+      );
+
+      setAssignments(assignmentsWithSubmissions);
+
+    } catch (error) {
+      console.log(error);
+    }
+
+  };
 
   useEffect(() => {
     fetchAssignments();
   }, []);
+
+  const filteredAssignments = assignments.filter((assignment) => {
+
+    if (filter === "all") return true;
+
+    return assignment.status === filter;
+
+  });
 
   return (
 
@@ -148,49 +159,84 @@ const editAssignment = async (assignment) => {
         Teacher Dashboard
       </h1>
 
+
       <form
-      onSubmit={handleCreateAssignment}
-      className="border border-black p-4 rounded mb-6 space-y-3"
-    >
-
-      <h2 className="text-lg font-semibold">
-        Create Assignment ➕
-      </h2>
-
-      <input
-        type="text"
-        placeholder="Title"
-        className="border p-2 w-full"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-
-      <textarea
-        placeholder="Description"
-        className="border p-2 w-full"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
-      <input
-        type="date"
-        className="border p-2 w-full"
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-      />
-
-      <button
-        type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        onSubmit={handleCreateAssignment}
+        className="border border-black p-4 rounded mb-6 space-y-3"
       >
-        Create Assignment 
-      </button>
 
-    </form>
+        <h2 className="text-lg font-semibold">
+          Create Assignment ➕
+        </h2>
+
+        <input
+          type="text"
+          placeholder="Title"
+          className="border p-2 w-full"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+
+        <textarea
+          placeholder="Description"
+          className="border p-2 w-full"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
+        <input
+          type="date"
+          className="border p-2 w-full"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+        />
+
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Create Assignment
+        </button>
+
+      </form>
+
+      <div className="flex gap-3 mb-6">
+
+        <button
+          onClick={() => setFilter("all")}
+          className="border px-3 py-1 rounded bg-gray-800 text-white"
+        >
+          All
+        </button>
+
+        <button
+          onClick={() => setFilter("draft")}
+          className="border px-3 py-1 rounded bg-yellow-500 text-white"
+        >
+          Draft
+        </button>
+
+        <button
+          onClick={() => setFilter("published")}
+          className="border px-3 py-1 rounded bg-blue-500 text-white"
+        >
+          Published
+        </button>
+
+        <button
+          onClick={() => setFilter("completed")}
+          className="border px-3 py-1 rounded bg-green-600 text-white"
+        >
+          Completed
+        </button>
+
+      </div>
+
+      {/* ASSIGNMENT LIST */}
 
       <div className="space-y-4">
 
-        {assignments.map((assignment) => (
+        {filteredAssignments.map((assignment) => (
 
           <div
             key={assignment._id}
@@ -202,15 +248,16 @@ const editAssignment = async (assignment) => {
             </h2>
 
             <p>{assignment.description}</p>
-             <p className="text-sm text-gray-500">
-    Due Date:
-    <span className="font-semibold text-gray-700 ml-1">
-      {new Date(assignment.dueDate).toLocaleDateString()}
-    </span>
-  </p>
+
+            <p className="text-sm text-gray-500">
+              Due Date:
+              <span className="font-semibold text-gray-700 ml-1">
+                {new Date(assignment.dueDate).toLocaleDateString()}
+              </span>
+            </p>
 
             <p className="text-sm font-semibold text-gray-500">
-              Status : 
+              Status:
               <span
                 className={`
                   ${assignment.status === "draft" ? "text-red-500" : ""}
@@ -229,62 +276,64 @@ const editAssignment = async (assignment) => {
                 {assignment.submissions}
               </span>
             </div>
-            
+
+
+
             <div className="flex gap-2 mt-3">
-            
-  {assignment.status === "draft" && (
-    <>
-      <button
-        onClick={() => editAssignment(assignment)}
-        className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
-      >
-        Edit
-      </button>
 
-      <button
-        onClick={() => deleteAssignment(assignment._id)}
-        className="bg-red-600 text-white px-3 py-1 rounded text-sm"
-      >
-        Delete
-      </button>
-    </>
-  )}
+              {assignment.status === "draft" && (
+                <>
+                  <button
+                    onClick={() => editAssignment(assignment)}
+                    className="bg-yellow-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Edit
+                  </button>
 
-  {assignment.status === "draft" && (
-    <button
-      onClick={() => publishAssignment(assignment._id)}
-      className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-    >
-      Publish
-    </button>
-  )}
+                  <button
+                    onClick={() => deleteAssignment(assignment._id)}
+                    className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Delete
+                  </button>
 
-  {assignment.status === "published" && (
-    <button
-      onClick={() => completeAssignment(assignment._id)}
-      className="bg-green-600 text-white px-3 py-1 rounded text-sm"
-    >
-      Complete
-    </button>
-  )}
+                  <button
+                    onClick={() => publishAssignment(assignment._id)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                  >
+                    Publish
+                  </button>
+                </>
+              )}
 
-  <button
-    onClick={() => viewSubmissions(assignment._id)}
-    className="bg-gray-600 text-white px-3 py-1 rounded text-sm"
-  >
-    View Submissions
-  </button>
+              {assignment.status === "published" && (
+                <button
+                  onClick={() => completeAssignment(assignment._id)}
+                  className="bg-green-600 text-white px-3 py-1 rounded text-sm"
+                >
+                  Complete
+                </button>
+              )}
 
-</div>
+              <button
+                onClick={() => viewSubmissions(assignment._id)}
+                className="bg-gray-600 text-white px-3 py-1 rounded text-sm"
+              >
+                View Submissions
+              </button>
+
+            </div>
+
           </div>
-          
 
         ))}
-        
+
       </div>
-      
+
     </div>
+
   );
+
 }
 
 export default TeacherDashboard;
